@@ -122,6 +122,7 @@ class TableCreator {
         const bgColorHex = document.getElementById('bgColorHex');
         const textBold = document.getElementById('textBold');
         const textItalic = document.getElementById('textItalic');
+        const columnFixed = document.getElementById('columnFixed');
         const fontSize = document.getElementById('fontSize');
         const columnCode = document.getElementById('columnCode');
         const optionsGroup = document.getElementById('optionsGroup');
@@ -137,6 +138,7 @@ class TableCreator {
         if (bgColorHex) bgColorHex.value = '#ffffff';
         if (textBold) textBold.checked = false;
         if (textItalic) textItalic.checked = false;
+        if (columnFixed) columnFixed.checked = false;
         if (fontSize) fontSize.value = 14;
         if (columnCode) columnCode.value = '';
         
@@ -176,6 +178,7 @@ class TableCreator {
             }
             if (existingCode.bold && textBold) textBold.checked = existingCode.bold;
             if (existingCode.italic && textItalic) textItalic.checked = existingCode.italic;
+            if (existingCode.fixed && columnFixed) columnFixed.checked = existingCode.fixed;
             if (existingCode.fontSize && fontSize) fontSize.value = existingCode.fontSize;
             
             // Load options from code or use cell values
@@ -282,6 +285,7 @@ class TableCreator {
             bgcolor: document.getElementById('bgColor').value,
             bold: document.getElementById('textBold').checked || undefined,
             italic: document.getElementById('textItalic').checked || undefined,
+            fixed: document.getElementById('columnFixed').checked || undefined,
             fontSize: parseInt(document.getElementById('fontSize').value) || undefined,
             options: options.length > 0 ? options : undefined
         };
@@ -620,6 +624,23 @@ class TableCreator {
             return code.type;
         };
 
+        // Check if column is fixed
+        const isColumnFixed = (colIndex) => {
+            const code = colCodes[colIndex];
+            return code && code.fixed;
+        };
+
+        // Calculate left offset for fixed columns
+        const getFixedLeftOffset = (colIndex) => {
+            let offset = 0;
+            for (let i = 0; i < colIndex; i++) {
+                if (isColumnFixed(i)) {
+                    offset += colWidths[i];
+                }
+            }
+            return offset;
+        };
+
         return `
             <div class="table-wrapper" data-table-id="${table.id}">
                 <div class="table-header">
@@ -655,7 +676,7 @@ class TableCreator {
                         <thead>
                             <tr>
                                 ${table.columns.map((col, index) => `
-                                    <th style="width: ${colWidths[index]}px; min-width: ${colWidths[index]}px;">
+                                    <th class="${isColumnFixed(index) ? 'fixed-column' : ''}" style="width: ${colWidths[index]}px; min-width: ${colWidths[index]}px; ${isColumnFixed(index) ? `left: ${getFixedLeftOffset(index)}px;` : ''}">
                                         <input 
                                             type="text" 
                                             class="column-name-input" 
@@ -705,7 +726,7 @@ class TableCreator {
                                         
                                         if (isSelect) {
                                             return `
-                                                <td class="select-cell" style="${cellStyle}">
+                                                <td class="select-cell ${isColumnFixed(cellIndex) ? 'fixed-column' : ''}" style="${cellStyle} ${isColumnFixed(cellIndex) ? `left: ${getFixedLeftOffset(cellIndex)}px;` : ''}">
                                                     <div class="multi-select-container" data-table-id="${table.id}" data-row-id="${row.id}" data-col-index="${cellIndex}">
                                                         <div class="selected-values">
                                                             ${cellArray.map(val => `
@@ -742,7 +763,7 @@ class TableCreator {
                                         } else if (isSelectSingle) {
                                             const cellValue = Array.isArray(cell) ? (cell.length > 0 ? cell[0] : '') : cell;
                                             return `
-                                                <td class="select-single-cell" style="${cellStyle}">
+                                                <td class="select-single-cell ${isColumnFixed(cellIndex) ? 'fixed-column' : ''}" style="${cellStyle} ${isColumnFixed(cellIndex) ? `left: ${getFixedLeftOffset(cellIndex)}px;` : ''}">
                                                     <div class="single-select-container" data-table-id="${table.id}" data-row-id="${row.id}" data-col-index="${cellIndex}">
                                                         <input 
                                                             type="text" 
@@ -764,7 +785,7 @@ class TableCreator {
                                             `;
                                         } else {
                                             return `
-                                                <td style="${cellStyle}">
+                                                <td class="${isColumnFixed(cellIndex) ? 'fixed-column' : ''}" style="${cellStyle} ${isColumnFixed(cellIndex) ? `left: ${getFixedLeftOffset(cellIndex)}px;` : ''}">
                                                     <input 
                                                         type="${inputType}"
                                                         class="cell-input" 

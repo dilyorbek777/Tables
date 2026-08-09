@@ -288,6 +288,22 @@ header p {
     user-select: none;
 }
 
+.data-table th.fixed-column {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: var(--background);
+    border-right: 2px solid var(--border-color);
+}
+
+.data-table td.fixed-column {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: var(--surface);
+    border-right: 2px solid var(--border-color);
+}
+
 .data-table th .column-name-input {
     width: 100%;
     padding: 0.5rem;
