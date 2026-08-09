@@ -476,6 +476,71 @@ class TableCreator {
         }
     }
 
+    handlePaste(tableId, startRowId, startColIndex, clipboardData) {
+        const table = this.tables.find(t => t.id === tableId);
+        if (!table) return;
+
+        const text = clipboardData.getData('text/plain');
+        if (!text) return;
+
+        // Parse TSV data (Excel uses tab-separated values)
+        const rows = text.split('\n').map(row => row.split('\t').filter(cell => cell !== ''));
+        
+        if (rows.length === 0 || (rows.length === 1 && rows[0].length === 0)) return;
+
+        const startRowIndex = table.rows.findIndex(r => r.id === startRowId);
+        if (startRowIndex === -1) return;
+
+        // Add columns if needed
+        const maxCols = Math.max(...rows.map(row => row.length));
+        const neededCols = startColIndex + maxCols - table.columns.length;
+        if (neededCols > 0) {
+            for (let i = 0; i < neededCols; i++) {
+                table.columns.push(`Column ${table.columns.length + 1}`);
+                table.columnTypes.push('text');
+                table.columnCodes.push(null);
+                table.columnWidths.push(150);
+                table.rows.forEach(row => row.cells.push(''));
+            }
+        }
+
+        // Add rows if needed
+        const neededRows = startRowIndex + rows.length - table.rows.length;
+        if (neededRows > 0) {
+            for (let i = 0; i < neededRows; i++) {
+                const newRow = {
+                    id: Date.now() + i,
+                    cells: table.columns.map(() => '')
+                };
+                table.rows.push(newRow);
+                table.rowHeights.push(40);
+            }
+        }
+
+        // Paste data
+        rows.forEach((row, rowOffset) => {
+            const targetRowIndex = startRowIndex + rowOffset;
+            if (targetRowIndex >= table.rows.length) return;
+
+            const targetRow = table.rows[targetRowIndex];
+            row.forEach((cellValue, colOffset) => {
+                const targetColIndex = startColIndex + colOffset;
+                if (targetColIndex >= targetRow.cells.length) return;
+
+                // Handle select columns
+                const colType = table.columnTypes[targetColIndex];
+                if (colType === 'select') {
+                    targetRow.cells[targetColIndex] = cellValue ? [cellValue] : [];
+                } else {
+                    targetRow.cells[targetColIndex] = cellValue;
+                }
+            });
+        });
+
+        this.saveToStorage();
+        this.render();
+    }
+
     clearAll() {
         if (confirm('Are you sure you want to delete all tables?')) {
             this.tables = [];
@@ -857,6 +922,14 @@ class TableCreator {
                 const rowId = parseInt(e.target.dataset.rowId);
                 const colIndex = parseInt(e.target.dataset.colIndex);
                 this.updateCell(table.id, rowId, colIndex, e.target.value);
+            });
+
+            // Paste from Excel
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const rowId = parseInt(e.target.dataset.rowId);
+                const colIndex = parseInt(e.target.dataset.colIndex);
+                this.handlePaste(table.id, rowId, colIndex, e.clipboardData);
             });
 
             // Keyboard navigation
