@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Creator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Table Creator</h1>
+            <p>Create, edit, and manage tables with ease</p>
+        </header>
+
+        <div class="controls">
+            <button id="addTableBtn" class="btn btn-primary">
+                <span class="icon">+</span> Add New Table
+            </button>
+            <button id="clearAllBtn" class="btn btn-danger">
+                <span class="icon" >🗑</span> Clear All
+            </button>
+        </div>
+
+        <div id="tablesContainer" class="tables-container">
+            <!-- Tables will be rendered here -->
+        </div>
+
+        <div id="emptyState" class="empty-state">
+            <div class="empty-icon">📊</div>
+            <h2>No tables yet</h2>
+            <p>Click "Add New Table" to create your first table</p>
+        </div>
+    </div>
+
+    <!-- Column Code Modal -->
+    <div id="columnCodeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Column Code</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="columnName">Column Name</label>
+                    <input type="text" id="columnName" placeholder="Column Name">
+                </div>
+                <div class="form-group">
+                    <label for="columnType">Type</label>
+                    <select id="columnType">
+                        <option value="">Default (text)</option>
+                        <option value="text">Text</option>
+                        <option value="number">Number</option>
+                        <option value="email">Email</option>
+                        <option value="date">Date</option>
+                        <option value="select">Select (multi)</option>
+                        <option value="select-single">Select (single)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="optionsGroup" style="display: none;">
+                    <label>Select Options</label>
+                    <div id="optionsList"></div>
+                    <div class="add-option-row">
+                        <input type="text" id="newOptionInput" placeholder="Add new option">
+                        <button type="button" class="btn btn-secondary" id="addOptionBtn">Add</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="columnWidth">Column Width (px)</label>
+                    <input type="number" id="columnWidth" value="150" min="50" max="500">
+                </div>
+                <div class="form-group">
+                    <label for="rowHeight">Row Height (px)</label>
+                    <input type="number" id="rowHeight" value="40" min="30" max="200">
+                </div>
+                <div class="form-group">
+                    <label for="textColor">Text Color</label>
+                    <input type="color" id="textColor" value="#1e293b">
+                    <input type="text" id="textColorHex" value="#1e293b" placeholder="#1e293b">
+                </div>
+                <div class="form-group">
+                    <label for="bgColor">Background Color</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                    <input type="text" id="bgColorHex" value="#ffffff" placeholder="#ffffff">
+                </div>
+                <div class="form-group">
+                    <label>Text Style</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="textBold">
+                            <span>Bold</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="textItalic">
+                            <span>Italic</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="fontSize">Font Size (px)</label>
+                    <input type="number" id="fontSize" value="14" min="8" max="32">
+                </div>
+                <div class="form-group">
+                    <label for="columnCode">Raw Code (JSON)</label>
+                    <textarea id="columnCode" rows="6" placeholder='{"type": "select", "color": "#1e293b", "bgcolor": "#ffffff", "width": 150, "height": 40}'></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelModal">Cancel</button>
+                <button class="btn btn-danger" id="deleteColumnCode">Delete Code</button>
+                <button class="btn btn-primary" id="saveColumnCode">Save Code</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
