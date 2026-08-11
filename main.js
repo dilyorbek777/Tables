@@ -722,6 +722,9 @@ class TableCreator {
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th class="row-number-header fixed-column" style="width: 50px; min-width: 50px; left: 0;">
+                                    #
+                                </th>
                                 ${table.columns.map((col, index) => `
                                     <th class="${isColumnFixed(index) ? 'fixed-column' : ''}" style="width: ${colWidths[index]}px; min-width: ${colWidths[index]}px; ${isColumnFixed(index) ? `left: ${getFixedLeftOffset(index)}px;` : ''}">
                                         <div class="th-content">
@@ -773,6 +776,9 @@ class TableCreator {
                         <tbody>
                             ${table.rows.map((row, rowIndex) => `
                                 <tr data-row-id="${row.id}" style="height: ${rowHeights[rowIndex]}px; min-height: ${rowHeights[rowIndex]}px;">
+                                    <td class="row-number-cell fixed-column" style="width: 50px; min-width: 50px; left: 0;">
+                                        ${rowIndex + 1}
+                                    </td>
                                     ${row.cells.map((cell, cellIndex) => {
                                         const isSelect = colTypes[cellIndex] === 'select';
                                         const isSelectSingle = colTypes[cellIndex] === 'select-single';

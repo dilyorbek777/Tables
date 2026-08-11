@@ -337,6 +337,24 @@ header p {
     border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.row-number-header {
+    text-align: center !important;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 15 !important;
+}
+
+.row-number-cell {
+    text-align: center !important;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    background: var(--background) !important;
+    border-right: 2px solid var(--border-color) !important;
+    z-index: 6 !important;
+}
+
 .data-table td.fixed-column {
     position: sticky;
     left: 0;
