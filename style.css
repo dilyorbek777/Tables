@@ -145,13 +145,14 @@ header p {
 }
 
 .btn-delete-column {
-    color: var(--danger-color);
+    color: rgba(255, 255, 255, 0.7);
     border: none;
     background: transparent;
 }
 
 .btn-delete-column:hover {
-    background: #fef2f2;
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
 }
 
 .btn-delete-row {
@@ -175,7 +176,7 @@ header p {
 }
 
 .btn-column-code {
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.7);
     border: none;
     background: transparent;
     position: relative;
@@ -183,8 +184,46 @@ header p {
 }
 
 .btn-column-code:hover {
-    background: #eef2ff;
-    color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.btn-sort-column {
+    color: rgba(255, 255, 255, 0.8);
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.4rem 0.6rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.btn-sort-column:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    transform: scale(1.1);
+}
+
+.th-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.th-content .column-name-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.th-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    position: relative;
 }
 
 .icon {
@@ -274,26 +313,28 @@ header p {
 }
 
 .data-table thead {
-    background: var(--background);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .data-table th {
-    padding: 1rem;
+    padding: 1.25rem 1rem;
     text-align: left;
     font-weight: 600;
-    color: var(--text-primary);
-    border-bottom: 2px solid var(--border-color);
+    color: white;
+    border-bottom: none;
     white-space: nowrap;
     position: relative;
     user-select: none;
+    background: transparent;
 }
 
 .data-table th.fixed-column {
     position: sticky;
     left: 0;
     z-index: 10;
-    background: var(--background);
-    border-right: 2px solid var(--border-color);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .data-table td.fixed-column {
@@ -311,15 +352,20 @@ header p {
     border-radius: var(--radius);
     font-size: 0.95rem;
     font-weight: 600;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
     outline: none;
     transition: all 0.2s ease;
 }
 
+.data-table th .column-name-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
 .data-table th .column-name-input:focus {
-    border-color: var(--primary-color);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .data-table th .btn-delete-column {

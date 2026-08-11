@@ -326,7 +326,7 @@ class TableCreator {
         const data = localStorage.getItem('tableCreatorData');
         const tables = data ? JSON.parse(data) : [];
         
-        // Migration: add columnWidths, rowHeights, columnTypes, and columnCodes to existing tables
+        // Migration: add columnWidths, rowHeights, columnTypes, columnCodes, and sort state to existing tables
         tables.forEach(table => {
             if (!table.columnWidths) {
                 table.columnWidths = table.columns.map(() => 150);
@@ -341,6 +341,12 @@ class TableCreator {
             }
             if (!table.columnCodes) {
                 table.columnCodes = table.columns.map(() => null);
+            }
+            if (table.sortColumn === undefined) {
+                table.sortColumn = null;
+            }
+            if (table.sortDirection === undefined) {
+                table.sortDirection = 'asc';
             }
             // Migration: convert select column cells to arrays if they're strings
             table.columnTypes.forEach((type, colIndex) => {
@@ -371,6 +377,8 @@ class TableCreator {
             columnCodes: [null, null, null],
             columnWidths: [150, 150, 150],
             rowHeights: [40, 40],
+            sortColumn: null,
+            sortDirection: 'asc',
             rows: [
                 { id: Date.now() + 1, cells: ['Cell 1', 'Cell 2', 'Cell 3'] },
                 { id: Date.now() + 2, cells: ['Cell 4', 'Cell 5', 'Cell 6'] }
@@ -478,6 +486,45 @@ class TableCreator {
                 this.saveToStorage();
             }
         }
+    }
+
+    // Sort operations
+    sortTable(tableId, colIndex) {
+        const table = this.tables.find(t => t.id === tableId);
+        if (!table) return;
+
+        // Toggle sort direction if clicking same column
+        if (table.sortColumn === colIndex) {
+            table.sortDirection = table.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            table.sortColumn = colIndex;
+            table.sortDirection = 'asc';
+        }
+
+        const colType = table.columnTypes[colIndex];
+        const isNumber = colType === 'number';
+
+        table.rows.sort((a, b) => {
+            const aValue = a.cells[colIndex];
+            const bValue = b.cells[colIndex];
+
+            if (isNumber) {
+                const aNum = parseFloat(aValue) || 0;
+                const bNum = parseFloat(bValue) || 0;
+                return table.sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+            } else {
+                const aStr = String(aValue || '').toLowerCase();
+                const bStr = String(bValue || '').toLowerCase();
+                if (table.sortDirection === 'asc') {
+                    return aStr.localeCompare(bStr);
+                } else {
+                    return bStr.localeCompare(aStr);
+                }
+            }
+        });
+
+        this.saveToStorage();
+        this.render();
     }
 
     handlePaste(tableId, startRowId, startColIndex, clipboardData) {
@@ -677,31 +724,41 @@ class TableCreator {
                             <tr>
                                 ${table.columns.map((col, index) => `
                                     <th class="${isColumnFixed(index) ? 'fixed-column' : ''}" style="width: ${colWidths[index]}px; min-width: ${colWidths[index]}px; ${isColumnFixed(index) ? `left: ${getFixedLeftOffset(index)}px;` : ''}">
-                                        <input 
-                                            type="text" 
-                                            class="column-name-input" 
-                                            value="${col}"
-                                            data-table-id="${table.id}"
-                                            data-col-index="${index}"
-                                        >
-                                        <button 
-                                            class="btn btn-icon btn-delete-column" 
-                                            data-table-id="${table.id}"
-                                            data-col-index="${index}"
-                                            title="Delete Column"
-                                        >×</button>
-                                        <button 
-                                            class="btn btn-icon btn-column-code" 
-                                            data-table-id="${table.id}"
-                                            data-col-index="${index}"
-                                            title="Column Code"
-                                            
-                                        >📝</button>
-                                        <div 
-                                            class="col-resize-handle" 
-                                            data-table-id="${table.id}"
-                                            data-col-index="${index}"
-                                        ></div>
+                                        <div class="th-content">
+                                            <input 
+                                                type="text" 
+                                                class="column-name-input" 
+                                                value="${col}"
+                                                data-table-id="${table.id}"
+                                                data-col-index="${index}"
+                                            >
+                                            <button 
+                                                class="btn btn-icon btn-sort-column" 
+                                                data-table-id="${table.id}"
+                                                data-col-index="${index}"
+                                                title="Sort"
+                                            >${table.sortColumn === index ? (table.sortDirection === 'asc' ? '↑' : '↓') : '↕'}</button>
+                                        </div>
+                                        <div class="th-actions">
+                                            <button 
+                                                class="btn btn-icon btn-delete-column" 
+                                                data-table-id="${table.id}"
+                                                data-col-index="${index}"
+                                                title="Delete Column"
+                                            >×</button>
+                                            <button 
+                                                class="btn btn-icon btn-column-code" 
+                                                data-table-id="${table.id}"
+                                                data-col-index="${index}"
+                                                title="Column Code"
+                                                
+                                            >📝</button>
+                                            <div 
+                                                class="col-resize-handle" 
+                                                data-table-id="${table.id}"
+                                                data-col-index="${index}"
+                                            ></div>
+                                        </div>
                                     </th>
                                 `).join('')}
                                 <th class="action-header">
@@ -881,6 +938,16 @@ class TableCreator {
                 e.stopPropagation();
                 const colIndex = parseInt(btn.dataset.colIndex);
                 this.openColumnCodeModal(table.id, colIndex);
+            });
+        });
+
+        // Sort column buttons
+        document.querySelectorAll(`.btn-sort-column[data-table-id="${table.id}"]`).forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const colIndex = parseInt(btn.dataset.colIndex);
+                this.sortTable(table.id, colIndex);
             });
         });
 
